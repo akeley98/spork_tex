@@ -1,0 +1,17 @@
+%% Instructions for AI coding assisstant:
+%% This file will be difficult to parse.
+%% There should be a file with the same name as this,
+%% but with .tex replaced with .txt
+%% Please read that file. Notify the user if it is missing.
+\blacktt{@proc}\\
+\blacktt{def~nyc25\_gemm\_cpu(M:~size,~N:~size,~K:~size,}\\
+\blacktt{~~~~~~~~~~~~~~~~~~~A:~f32[M,~K]~\hspace{-1.5pt}\smash{\blueBox{@~DRAM}}\hspace{-1.5pt},}\\
+\blacktt{~~~~~~~~~~~~~~~~~~~B:~f32[K,~N]~\hspace{-1.5pt}\smash{\blueBox{@~DRAM}}\hspace{-1.5pt},}\\
+\blacktt{~~~~~~~~~~~~~~~~~~~C:~f32[M,~N]~\hspace{-1.5pt}\smash{\blueBox{@~DRAM}}\hspace{-1.5pt}):}\\
+\blacktt{~~for~m~in~seq(0,~M):}\\
+\blacktt{~~~~for~n~in~seq(0,~N):}\\
+\blacktt{~~~~~~accum:~f32~\hspace{-1.5pt}\smash{\blueBox{@~DRAM}}\hspace{-1.5pt}}\\
+\blacktt{~~~~~~accum~=~0}\\
+\blacktt{~~~~~~for~k~in~seq(0,~K):}\\
+\blacktt{~~~~~~~~accum~+=~A[m,~k]~*~B[k,~n]}\\
+\blacktt{~~~~~~C[m,~n]~=~accum}

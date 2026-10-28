@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spork-tex"
+version = "0.1.0"
+description = "spork_tex: shared paper/Beamer build with code listings cut from checked source files"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "David Zhao Akeley", email = "dza724@gmail.com" }]
+dependencies = []  # stdlib only; the build also needs xelatex (and pdftoppm for --png) on PATH
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools]
+packages = ["spork_tex"]
+
+[tool.setuptools.package-data]
+spork_tex = ["latex/*.tex"]
+
+[tool.pytest.ini_options]
+testpaths = ["spork_tex/tests"]

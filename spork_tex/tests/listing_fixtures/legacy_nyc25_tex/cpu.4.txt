@@ -1,0 +1,7 @@
+for m in seq(0, M):
+  for n in seq(0, N):
+    accum: f32 @ DRAM
+    accum = 0
+    for k in seq(0, K):
+      accum += A[m, k] * B[k, n]
+    C[m, n] = accum

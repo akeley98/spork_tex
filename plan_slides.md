@@ -1,5 +1,11 @@
 # Plan: Shared Paper/Slides Build (`code_to_tex` package, Beamer)
 
+2026-10-28: moved with the package (and `plan_slides_human_wishlist.md`) out of spork/endgame_plan into its own repo `spork_tex`
+(pip-installable: `pip install --user -e .`), and the module was renamed `code_to_tex` -> `spork_tex` (`python3 -m spork_tex.build`;
+env var `SPORK_TEX_LATEX_DIR`). The LaTeX file `code_to_tex_support.tex` kept its name, since every document `\input`s it.
+Below, `code_to_tex` and paths like `spork/docs/code_to_tex/` and `endgame_plan/` are history; the package is now
+`spork_tex/spork_tex/` and documents live anywhere (first user still `spork/docs/amspork3`).
+
 Status: design agreed with David (2026-10-21). Phases 1-2 (package: spork_style.tex, listing generator, build driver incl. `--arxiv`) implemented 2026-10-21;
 phases 3-4 (amspork3 migration, `beamer_nyc25_test` smoke deck) done; phase 5 docs: `spork/docs/code_to_tex/REFERENCE_CARD.md` (terse) and `PRIMER.md` (walkthrough).
 Listing filter syntax change and the smoke-test fix list implemented 2026-10-21 (252 tests passing).
