@@ -1,0 +1,113 @@
+%% ========================================================================
+%% LEGACY FILE FROM THE HUMAN ERA: Prefer `python3 -m spork_tex.build`
+%% https://github.com/akeley98/spork_tex
+%% ========================================================================
+
+\documentclass[11pt]{article}
+
+\usepackage[letterpaper, portrait, margin=2.54cm]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{placeins}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{colortbl}
+\usepackage[parfill=0pt]{parskip}
+\usepackage[mathscr]{euscript}
+\usepackage[usenames,dvipsnames,svgnames,table,hyperref]{xcolor}
+\usepackage{mathpartir}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fontspec}
+\usepackage{mathtools}
+\usepackage{mdframed}
+\usepackage{tikz}
+\usepackage{titlesec}
+\usepackage{stmaryrd}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+
+\setsansfont{FreeSans}
+\setmonofont{Ubuntu Mono}
+
+\hyphenation{WebGL}
+
+% Latex stupidity: need to escape # as \# in URL.
+\definecolor{webColor}{RGB}{0, 108, 174}
+\newcommand{\web}[1]{{\color{webColor} \small \url{#1}}}
+\newcommand{\webText}[2]{{\color{webColor} \href{#2}{#1}}}
+
+\newcommand{\email}[2]{{\small \color{webColor} \textsf{\href{mailto:#1@#2}{#1[at]#2}}}}
+\definecolor{titleColor}{RGB}{0, 0, 0}
+\newcommand{\myTitle}[1]{{ \vspace{2mm} \large \color{titleColor} \hspace{-12mm} \textbf{\textsf{#1}} \vspace{2mm}}}
+\definecolor{subColor}{RGB}{170, 149, 0}
+\newcommand{\mySub}[1]{{\color{subColor}\hspace{-9mm} \textsf{#1}}}
+\definecolor{keyColor}{RGB}{118, 185, 0}
+\newcommand{\myKey}[1]{{\color{keyColor}\textbf{#1}}}
+
+%\setcounter{secnumdepth}{0}
+% I'm not sure why these exist instead of section/subsection
+\newcommand{\mySection}[1]{{ \vspace{2mm} \section{\large \color{titleColor} \hspace{-12mm} \textbf{\textsf{#1}}} \vspace{2mm}}}
+\newcommand{\mySubsection}[1]{{ \subsection{\color{mainColor} \hspace{-9mm} \textsf{#1}}}}
+\newcommand{\mySubsectionMinor}[1]{{ \subsection{\color{minorColor} \hspace{-9mm} \textsf{#1}}}}
+
+\newcommand{\myChapterLink}[2]{\textsf{{\color{webColor} \hyperref[#1]{#2}}, page \pageref{#1}}}
+
+\definecolor{keyColorA}{RGB}{170, 149, 0}
+\definecolor{keyColorB}{RGB}{170, 210, 0}
+\newcommand{\myKeyA}[1]{\textbf{\color{keyColorA}#1}}
+\newcommand{\myKeyB}[1]{\textbf{\color{keyColorB}#1}}
+
+\definecolor{mainColor}{RGB}{170, 0, 170}
+\definecolor{minorColor}{RGB}{0, 149, 232}
+\newcommand{\mainKey}[1]{\textbf{\color{mainColor}#1}}
+\newcommand{\minorKey}[1]{\textbf{\color{minorColor}#1}}
+\newcommand{\mainSub}[1]{{\color{mainColor}\hspace{-9mm} \textsf{#1}}}
+\newcommand{\minorSub}[1]{{\color{minorColor}\hspace{-9mm} \textsf{#1}}}
+
+\titleformat*{\section}{\normalfont\sffamily\large\bfseries}
+\titlespacing{\section}{-15mm}{4mm}{2mm}
+\newcommand{\useMainSub}{\titleformat*{\subsection}{\color{mainColor}\normalfont\sffamily}}
+\newcommand{\useMinorSub}{\titleformat*{\subsection}{\color{minorColor}\normalfont\sffamily}}
+\titlespacing{\subsection}{-15mm}{2mm}{1mm}
+\useMainSub
+\newcommand{\magicSection}[2]{\section{#1 \hfill \small \graytt{#2}}\label{#2}}
+\newcommand{\magicSubsection}[2]{\subsection{#1 \hfill \small \graytt{#2}}\label{#2}}
+
+\definecolor{hookColor}{RGB}{204, 0, 255}
+\newcommand{\hook}[1]{{\color{hookColor}\textbf{#1}}}
+\definecolor{flaggedBoxColor}{RGB}{255, 204, 204}
+\newcommand{\flagged}[1]{{\color{black}\colorbox{flaggedBoxColor}{#1}}}
+
+\definecolor{lightttColor}{RGB}{69, 69, 80}
+\definecolor{grayttColor}{RGB}{144, 144, 160}
+\newcommand{\lighttt}[1]{{\color{lightttColor}\texttt{#1}}}
+\newcommand{\graytt}[1]{{\color{grayttColor}\texttt{#1}}}
+\newcommand{\blacktt}[1]{{\color{black}\texttt{#1}}}
+\newcommand{\lightsf}[1]{{\color{lightttColor}\textsf{#1}}}
+
+\input{colorbox_common.tex}
+
+\renewcommand*{\theenumi}{\alph{enumi}}
+\renewcommand*\labelenumi{(\theenumi)}
+\renewcommand*{\theenumii}{\roman{enumii}}
+\renewcommand*\labelenumii{\theenumii.}
+
+\newcommand{\fixminipage}{\raggedright \setlength{\parskip}{0.3\baselineskip}}
+\newcommand{\codeminipage}{\raggedright \setlength{\parskip}{0\baselineskip}}
+
+\sloppy
+\newcommand{\abs}[1]{\left \vert #1 \right\vert}
+
+% Some of these links are now dead...
+\newcommand{\mbarrier}{\webText{mbarrier}{https://docs.nvidia.com/cuda/parallel-thread-execution/\#parallel-synchronization-and-communication-instructions-mbarrier}}
+\newcommand{\cpAsync}{\webText{cp.async}{https://docs.nvidia.com/cuda/parallel-thread-execution/\#data-movement-and-conversion-instructions-cp-async}}
+\newcommand{\cpAsyncBulk}{\webText{cp.async.bulk}{https://docs.nvidia.com/cuda/parallel-thread-execution/\#data-movement-and-conversion-instructions-cp-async-bulk}}
+\newcommand{\fenceProxyAsync}{\webText{fence.proxy.async}{https://docs.nvidia.com/cuda/parallel-thread-execution/\#asynchronous-warpgroup-level-matrix-async-proxy}}
+\newcommand{\wgmma}{\webText{wgmma}{https://docs.nvidia.com/cuda/parallel-thread-execution/\#asynchronous-warpgroup-level-matrix-instructions}}
+\newcommand{\hopperBlog}{\webText{NVIDIA Hopper Architecture In-Depth}{https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/}}
+\newcommand{\expectTxOperation}{\webText{expect-tx operation}{https://docs.nvidia.com/cuda/parallel-thread-execution/\#parallel-synchronization-and-communication-instructions-mbarrier-expect-tx-operation}}
+\newcommand{\completeTxOperation}{\webText{complete-tx operation}{https://docs.nvidia.com/cuda/parallel-thread-execution/\#parallel-synchronization-and-communication-instructions-mbarrier-complete-tx-operation}}
+\newcommand{\wgmmaFence}{\webText{wgmma.fence}{https://docs.nvidia.com/cuda/parallel-thread-execution/\#asynchronous-warpgroup-level-matrix-instructions-wgmma-fence}}

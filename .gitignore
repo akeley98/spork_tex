@@ -5,3 +5,5 @@ dist/
 .pytest_cache/
 # Viewer copies written next to beamer_nyc25_test/ (viewer_copy_dir "..")
 /spork_tex/beamer_nyc25_test*.pdf
+*~
+\#*
