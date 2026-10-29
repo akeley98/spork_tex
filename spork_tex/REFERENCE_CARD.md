@@ -5,6 +5,7 @@ One page to get oriented. Details, in increasing depth:
 * Guided walkthrough (writing a deck, figure, and listing in this setup): [PRIMER.md](PRIMER.md)
 * Listing directives, outputs, `\sporkListing`, marks: [README.md](README.md)
 * Every style macro / color / TikZ key: header comments + sections of [latex/spork_style.tex](latex/spork_style.tex)
+* Where these files are installed: `python3 -m spork_tex.docs` (repo: https://github.com/akeley98/spork_tex.git)
 * Build driver: `python3 -m spork_tex.build --help` (works from any directory once installed: `pip install --user -e .` in `spork_tex/`)
 * Design rationale and known pitfalls: [../plan_slides.md](../plan_slides.md) ("Implementation notes")
 * Worked example of everything: [`beamer_nyc25_test/`](beamer_nyc25_test/) in this package

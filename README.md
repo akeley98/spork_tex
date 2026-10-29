@@ -20,6 +20,10 @@ python3 -m spork_tex SRC OUTDIR                             # listing generator 
 ```
 
 Needs `xelatex` on PATH (and `pdftoppm` for `--png`).
+`python3 -m spork_tex.docs` prints where the documentation is installed (`--card`: just the reference card),
+so documents using spork_tex can point there instead of assuming a checkout location.
+
+Repository: https://github.com/akeley98/spork_tex.git
 
 ## Layout
 

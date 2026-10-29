@@ -40,7 +40,8 @@ if __package__ in (None, ""):  # pragma: no cover - run as a plain script
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     __package__ = "spork_tex"
 
-from . import build_aux, build_log  # noqa: E402
+from . import REPO_URL, build_aux, build_log  # noqa: E402
+from .docs import REFERENCE_CARD  # noqa: E402
 
 PROG = "python3 -m spork_tex.build"
 
@@ -107,7 +108,8 @@ def make_parser() -> argparse.ArgumentParser:
         epilog=(
             "Typical agent loop for one slide: --slides DECK --frame LABEL --skip-code --png, "
             "then look at preview/DECK_frame,LABEL,STEP.png. Use --where LABEL to find which frame "
-            "(and pages) contain a \\label."
+            "(and pages) contain a \\label. "
+            f"Reference card: {REFERENCE_CARD} (all docs: python3 -m spork_tex.docs; {REPO_URL})."
         ),
     )
     p.add_argument("dir", help="document directory (contains main.tex, decks, tex_build.json); becomes the cwd")

@@ -5,6 +5,8 @@
 env var `SPORK_TEX_LATEX_DIR`). The LaTeX file `code_to_tex_support.tex` kept its name, since every document `\input`s it.
 Below, `code_to_tex` and paths like `spork/docs/code_to_tex/` and `endgame_plan/` are history; the package is now
 `spork_tex/spork_tex/` and documents live anywhere (first user still `spork/docs/amspork3`).
+Documents point at the repo URL (https://github.com/akeley98/spork_tex.git) and at `python3 -m spork_tex.docs [--card]`, which
+prints where the docs are installed (the `.md` files ship as package data), instead of assuming a checkout path.
 
 Status: design agreed with David (2026-10-21). Phases 1-2 (package: spork_style.tex, listing generator, build driver incl. `--arxiv`) implemented 2026-10-21;
 phases 3-4 (amspork3 migration, `beamer_nyc25_test` smoke deck) done; phase 5 docs: `spork/docs/code_to_tex/REFERENCE_CARD.md` (terse) and `PRIMER.md` (walkthrough).

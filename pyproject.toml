@@ -11,6 +11,9 @@ requires-python = ">=3.10"
 authors = [{ name = "David Zhao Akeley", email = "dza724@gmail.com" }]
 dependencies = []  # stdlib only; the build also needs xelatex (and pdftoppm for --png) on PATH
 
+[project.urls]
+Repository = "https://github.com/akeley98/spork_tex.git"
+
 [project.optional-dependencies]
 test = ["pytest"]
 
@@ -18,7 +21,7 @@ test = ["pytest"]
 packages = ["spork_tex"]
 
 [tool.setuptools.package-data]
-spork_tex = ["latex/*.tex"]
+spork_tex = ["latex/*.tex", "*.md"]  # docs too: python3 -m spork_tex.docs finds them
 
 [tool.pytest.ini_options]
 testpaths = ["spork_tex/tests"]
