@@ -125,6 +125,7 @@ Elements without a spec appear in both. Bare `\only<..>`, `\node<..>`, `\pause`,
 Frames: `\begin{frame}[label=dag]{Title\sporkTitleTag{\sporkInvBlue{GEMM v1}}}`; `\sporkExtraSlides` for the appendix.
 Pitfall: `\begin{frame}{Title}{...}` makes the braced group an (invisible) subtitle.
 Pitfall: `[label=fig:x]` (unbraced `:`) makes Beamer silently drop the whole frame; the build lints it (`label={fig:x}` works).
+Pitfall: `\sporkReveal` doesn't work inside TikZ node text ("Did you forget a semicolon?")
 
 ### Differences from stock Beamer (surprising even if you know Beamer)
 
