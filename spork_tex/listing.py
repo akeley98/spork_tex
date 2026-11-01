@@ -80,6 +80,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="python3 -m spork_tex",
         description="Generate LaTeX code listings (NAME.tex, NAME.N.txt, NAME.N.dbg) from '# TeX: ' directives.",
+        epilog=(
+            "related commands:\n"
+            "  python3 -m spork_tex.docs          paths of the reference card, primer and other docs\n"
+            "  python3 -m spork_tex.docs --card   only the reference card's path, e.g. less $(...)\n"
+            "  python3 -m spork_tex.build --help  build driver (papers, slide decks)"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("src", help="annotated source file, e.g. samples.py")
     parser.add_argument("out_dir", help="output directory, e.g. code/")
