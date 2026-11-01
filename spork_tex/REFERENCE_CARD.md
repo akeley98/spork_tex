@@ -126,6 +126,7 @@ Frames: `\begin{frame}[label=dag]{Title\sporkTitleTag{\sporkInvBlue{GEMM v1}}}`;
 Pitfall: `\begin{frame}{Title}{...}` makes the braced group an (invisible) subtitle.
 Pitfall: `[label=fig:x]` (unbraced `:`) makes Beamer silently drop the whole frame; the build lints it (`label={fig:x}` works).
 Pitfall: `\sporkReveal` doesn't work inside TikZ node text ("Did you forget a semicolon?")
+Pitfall: `ex`/`em` in TikZ node options (`text height=1.7ex`) use the font before the node's `font=`; use pt.
 
 ### Differences from stock Beamer (surprising even if you know Beamer)
 
