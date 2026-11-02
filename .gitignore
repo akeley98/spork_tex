@@ -7,3 +7,5 @@ dist/
 /spork_tex/beamer_nyc25_test*.pdf
 *~
 \#*
+# --png output from builds before --png took a directory (2026-11-01), for old checkouts
+/spork_tex/beamer_nyc25_test/preview/

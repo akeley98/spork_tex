@@ -2,7 +2,7 @@
 
     python3 -m spork_tex.build <dir> [--slides DECK]... [--no-paper]
         [--frame LABEL[,LABEL]] [--skip-code]
-        [--png] [--where LABEL] [--arxiv OUT.tar.gz]
+        [--png DIR] [--where LABEL] [--arxiv OUT.tar.gz]
 
 Replaces the old ``amspork3_tex.sh`` (spork repo, ``docs/``). See ``plan_slides.md`` at the
 repository root ("Build driver") for the design. Python 3.10 stdlib only; never uses a shell.
@@ -17,8 +17,8 @@ Figures have no build mode of their own: they are ``sporkfigure`` environments i
 decks, seen in context (``--frame ... --png``, or the paper page found with ``--where``).
 
 Removal policy: the driver only ever deletes or overwrites files it generates itself
-(``copied_styles/*`` copies, ``preview/<job>,*.png``, viewer-copy temp files, and its own
-temp directories).
+(``copied_styles/*`` copies, viewer-copy temp files, and its own temp directories). ``--png DIR``
+overwrites PNGs of the same name in DIR but never deletes old ones.
 """
 
 from __future__ import annotations
@@ -106,8 +106,8 @@ def make_parser() -> argparse.ArgumentParser:
             "summarized at the end; only real failures give a nonzero exit code."
         ),
         epilog=(
-            "Typical agent loop for one slide: --slides DECK --frame LABEL --skip-code --png, "
-            "then look at preview/DECK_frame,LABEL,STEP.png. Use --where LABEL to find which frame "
+            "Typical agent loop for one slide: --slides DECK --frame LABEL --skip-code --png SCRATCH "
+            "(the agent's scratch directory), then look at SCRATCH/DECK_frame,LABEL,STEP.png. Use --where LABEL to find which frame "
             "(and pages) contain a \\label. "
             f"Reference card: {REFERENCE_CARD} (all docs: python3 -m spork_tex.docs; {REPO_URL})."
         ),
@@ -125,13 +125,14 @@ def make_parser() -> argparse.ArgumentParser:
                         "skips the paper and the full deck; never updates viewer copies")
     p.add_argument("--skip-code", action="store_true",
                    help="skip the check command and the listing generator")
-    p.add_argument("--png", action="store_true",
-                   help="render the PDFs built in this run to PNGs in preview/ at 110 dpi (whole "
+    p.add_argument("--png", metavar="DIR",
+                   help="render the PDFs built in this run to PNGs in DIR (created if missing; an "
+                        "agent's scratch directory) at 110 dpi (whole "
                         "pages: paper pages and slides keep their page bounds). Slides are named "
                         "<job>,<frame label>,<overlay step>.png ('/' in a label written as '%%'; "
                         "unlabelled frames <job>,,f<N>,<step>.png; a label several frames share "
-                        "gets ,f<N> before the step), paper pages main,p<page>.png; the job's old "
-                        "PNGs are removed first")
+                        "gets ,f<N> before the step), paper pages main,p<page>.png. Existing files "
+                        "of the same name are overwritten; nothing else in DIR is touched")
     p.add_argument("--where", metavar="LABEL",
                    help="report the page(s) and frame(s) containing LABEL from main.aux and the deck .aux "
                         "files (the --slides decks, else every beamer deck in the dir). Query only: builds "
@@ -149,7 +150,7 @@ class Options:
     build_paper: bool
     frame: list[str] | None
     skip_code: bool
-    png: bool
+    png: str | None  # absolute PNG output directory
     where: str | None
     arxiv: str | None
     where_only: bool
@@ -167,6 +168,7 @@ def parse_args(argv: list[str] | None = None) -> Options:
     if not os.path.isdir(doc_dir):
         parser.error(f"document directory {a.dir!r} does not exist")
     arxiv = os.path.abspath(a.arxiv) if a.arxiv else None
+    png = os.path.abspath(a.png) if a.png else None  # before run() changes into the doc dir
 
     slides = []
     for s in a.slides:
@@ -190,7 +192,7 @@ def parse_args(argv: list[str] | None = None) -> Options:
 
     build_paper = not a.no_paper and frame is None
     # Pure query: --where with nothing else that selects something to build.
-    where_only = a.where is not None and frame is None and arxiv is None and not a.png
+    where_only = a.where is not None and frame is None and arxiv is None and png is None
     if where_only:
         build_paper = False
     return Options(
@@ -200,7 +202,7 @@ def parse_args(argv: list[str] | None = None) -> Options:
         build_paper=build_paper,
         frame=frame,
         skip_code=a.skip_code,
-        png=a.png,
+        png=png,
         where=a.where,
         arxiv=arxiv,
         where_only=where_only,
@@ -498,7 +500,7 @@ class PngGroup:
     note: str = ""  # e.g. "frame 35, pages 147-151"
 
     def describe(self) -> str:
-        """``preview/26,ScopeCheck,{1..5}.png  (note)``: bash brace notation for a run of files."""
+        """``/scratch/26,ScopeCheck,{1..5}.png  (note)``: bash brace notation for a run of files."""
         first, last = self.paths[0], self.paths[-1]
         if len(self.paths) == 1:
             text = first
@@ -554,9 +556,9 @@ def png_names(job: str, kind: str, pages: int, aux_path: str) -> list[tuple[list
     return groups
 
 
-def render_png(res: JobResult, out_dir: str = "preview") -> list[PngGroup]:
-    """Render res's PDF to out_dir, one PNG per page named by png_names (old PNGs of this job,
-    any ``<job>,*.png``, removed first).
+def render_png(res: JobResult, out_dir: str) -> list[PngGroup]:
+    """Render res's PDF to out_dir, one PNG per page named by png_names. Files of the same name
+    are overwritten; nothing is deleted (out_dir is meant to be an agent's scratch directory).
 
     Pages are not cropped: placement on the paper page or slide is part of what to look at.
     """
@@ -567,10 +569,6 @@ def render_png(res: JobResult, out_dir: str = "preview") -> list[PngGroup]:
         return []
     os.makedirs(out_dir, exist_ok=True)
     job = res.job.name
-    pat = re.compile(rf"^{re.escape(job + PNG_SEP)}.+\.png$")
-    for n in os.listdir(out_dir):
-        if pat.match(n):
-            os.remove(os.path.join(out_dir, n))
     # pdftoppm pads page numbers to the page count's width; render into a fresh temp dir and rename.
     # The temp dir is inside out_dir so os.replace never crosses filesystems.
     with tempfile.TemporaryDirectory(prefix=f".{job}.", dir=out_dir) as tmp:
@@ -641,7 +639,7 @@ def _fls_inputs(job_name: str) -> list[str]:
     return out
 
 
-LINT_EXCLUDE_DIRS = ("copied_styles", "code", "samples", "preview")
+LINT_EXCLUDE_DIRS = ("copied_styles", "code", "samples")
 
 
 def lint_sources(job_names: list[str]) -> list:
@@ -857,13 +855,13 @@ def run(opts: Options) -> int:
     pngs: list[PngGroup] = []
     if opts.png:
         for res in results:
-            pngs.extend(render_png(res))
+            pngs.extend(render_png(res, opts.png))
 
     summary = format_summary(results, lint, notes)
     if summary:
         print(summary)
     if pngs:
-        print(f"PNG previews (paths relative to {opts.doc_dir}):")
+        print("PNG previews:")
         for g in pngs:
             print("  " + g.describe())
 

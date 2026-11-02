@@ -4,7 +4,7 @@
    by-products, and do a clean xelatex build of main.tex there with -recorder
    (so nothing in the real document dir is deleted).
 2. Package exactly the project-relative files listed as INPUT in main.fls, minus
-   slides/samples/previews, PDFs compiled from a .tex of the dir, and the job's own by-products,
+   slides/samples, PDFs compiled from a .tex of the dir, and the job's own by-products,
    plus 00README.json (main.tex toplevel, xelatex).
 3. Verify: extract into another temp dir and rebuild twice without -recorder.
 """
@@ -24,7 +24,7 @@ from . import build, build_log
 
 JOB = "main"
 BYPRODUCT_EXTS = (".aux", ".log", ".out", ".fls", ".nav", ".snm", ".toc", ".vrb", ".synctex.gz", ".blg")
-EXCLUDE_DIRS = ("samples", "preview")
+EXCLUDE_DIRS = ("samples",)
 README = {
     "process": {"compiler": "xelatex"},
     "sources": [{"filename": "main.tex", "usage": "toplevel"}],

@@ -327,7 +327,7 @@ On slides they become overlay specs (`1,3,4-`); on paper they are tested against
   typeset into a box and scaled as a whole by `S` (default `\sporkFigScale` = 1 in both modes; `\sporkFigFont` is 11pt, the paper body size, so no compensating scale is needed).
   A figure used in several places keeps its TikZ in `fig_<name>_body.tex` (no preamble), `\input` inside a `sporkfigure`
   at each place, and a slide can add elements placed relative to the body's nodes. There is no standalone figure build:
-  look at figures in context (`--frame LABEL --png`, or the paper page `--where fig:x` names, with `--png`).
+  look at figures in context (`--frame LABEL --png DIR`, or the paper page `--where fig:x` names, with `--png DIR`).
   * **Node names are local.** Stock TikZ keeps every node name for the rest of the document, so a picture referring to
     a name it doesn't define silently uses whatever picture defined it last (and `name prefix` silently falls back
     to the unprefixed name). In a `sporkfigure`, (1) every name it creates (nodes, coordinates, `alias=`, pic and matrix

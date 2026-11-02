@@ -54,9 +54,11 @@ def keep_cwd():
 def test_parse_args_resolves_paths(tmp_path, monkeypatch):
     (tmp_path / "doc").mkdir()
     monkeypatch.chdir(tmp_path)
-    o = build.parse_args(["doc", "--slides", "deck.tex", "--slides", "deck", "--arxiv", "out.tar.gz"])
+    o = build.parse_args(["doc", "--slides", "deck.tex", "--slides", "deck", "--arxiv", "out.tar.gz",
+                          "--png", "scratch"])
     assert o.doc_dir == str(tmp_path / "doc")
     assert o.arxiv == str(tmp_path / "out.tar.gz")
+    assert o.png == str(tmp_path / "scratch")  # the caller's cwd, not the doc dir
     assert o.slides == ["deck"]
     assert o.build_paper and not o.where_only
 
@@ -69,7 +71,7 @@ def test_parse_args_modes(tmp_path):
     assert not o.build_paper and o.slides == ["deck"]
     o = build.parse_args([d, "--where", "lab"])
     assert o.where_only and not o.build_paper
-    o = build.parse_args([d, "--where", "lab", "--png"])
+    o = build.parse_args([d, "--where", "lab", "--png", d])
     assert not o.where_only
 
 
@@ -810,26 +812,29 @@ def test_latex_error_with_pdf_is_not_fatal(docdir, capsys):
 
 
 @needs_xelatex
-def test_frame_build(docdir, capsys):
-    assert build.main([str(docdir), "--slides", "deck", "--frame", "steps", "--png"]) == 0
+def test_frame_build(docdir, tmp_path, capsys):
+    scratch = tmp_path / "scratch"
+    assert build.main([str(docdir), "--slides", "deck", "--frame", "steps", "--png", str(scratch)]) == 0
     out = capsys.readouterr().out
     assert _pdf_pages(docdir / "deck_frame.log") == 3
     assert not (docdir / "deck.pdf").exists() and not (docdir / "main.pdf").exists()
     assert not (docdir.parent / "mydoc_deck.pdf").exists()
-    pngs = sorted(os.listdir(docdir / "preview"))
+    assert not (docdir / "preview").exists()
+    pngs = sorted(os.listdir(scratch))
     assert pngs == ["deck_frame,steps,1.png", "deck_frame,steps,2.png", "deck_frame,steps,3.png"]
-    assert f"PNG previews (paths relative to {docdir}):" in out
-    assert "  preview/deck_frame,steps,{1..3}.png\n" in out
-    # Two frames; stale PNGs of this job are replaced, other jobs' kept (also deck_frame_x, whose
-    # name extends this job's).
-    (docdir / "preview" / "other,p1.png").write_bytes(b"x")
-    (docdir / "preview" / "deck_frame,old,1.png").write_bytes(b"x")
-    (docdir / "preview" / "deck_frame_x,p1.png").write_bytes(b"x")
-    assert build.main([str(docdir), "--slides", "deck", "--frame", "intro,last", "--png", "--skip-code"]) == 0
+    assert f"PNG previews:\n  {scratch}/deck_frame,steps,{{1..3}}.png\n" in out
+    # Two other frames: same-named PNGs are overwritten, nothing is deleted (the earlier frame's
+    # PNGs and unrelated files stay).
+    (scratch / "deck_frame,intro,1.png").write_bytes(b"x")
+    (scratch / "other,p1.png").write_bytes(b"x")
+    assert build.main([str(docdir), "--slides", "deck", "--frame", "intro,last", "--png", str(scratch),
+                       "--skip-code"]) == 0
     assert _pdf_pages(docdir / "deck_frame.log") == 3  # 2 + 1
-    assert sorted(os.listdir(docdir / "preview")) == ["deck_frame,intro,1.png", "deck_frame,intro,2.png",
-                                                      "deck_frame,last,1.png", "deck_frame_x,p1.png",
-                                                      "other,p1.png"]
+    assert sorted(os.listdir(scratch)) == ["deck_frame,intro,1.png", "deck_frame,intro,2.png",
+                                           "deck_frame,last,1.png", "deck_frame,steps,1.png",
+                                           "deck_frame,steps,2.png", "deck_frame,steps,3.png",
+                                           "other,p1.png"]
+    assert (scratch / "deck_frame,intro,1.png").read_bytes().startswith(b"\x89PNG")
 
 
 @needs_xelatex
@@ -843,16 +848,17 @@ def test_frame_unknown_label(docdir, capsys):
 
 
 @needs_xelatex
-def test_deck_png_names_and_duplicate_label(docdir, capsys):
+def test_deck_png_names_and_duplicate_label(docdir, tmp_path, capsys):
     deck = docdir / "deck.tex"
     deck.write_text(deck.read_text().replace("[label=last]", "[label=intro]"))
-    assert build.main([str(docdir), "--no-paper", "--slides", "deck", "--png"]) == 0
+    scratch = tmp_path / "scratch"
+    assert build.main([str(docdir), "--no-paper", "--slides", "deck", "--png", str(scratch)]) == 0
     out = capsys.readouterr().out
-    assert sorted(os.listdir(docdir / "preview")) == [
+    assert sorted(os.listdir(scratch)) == [
         "deck,,f2,1.png", "deck,intro,f1,1.png", "deck,intro,f1,2.png", "deck,intro,f4,1.png",
         "deck,steps,1.png", "deck,steps,2.png", "deck,steps,3.png"]
-    assert "  preview/deck,steps,{1..3}.png  (frame 3, pages 4-6)\n" in out
-    assert "  preview/deck,,f2,1.png  (frame 2, page 3)\n" in out
+    assert f"  {scratch}/deck,steps,{{1..3}}.png  (frame 3, pages 4-6)\n" in out
+    assert f"  {scratch}/deck,,f2,1.png  (frame 2, page 3)\n" in out
     assert "deck: frame label 'intro' is used by frames 1, 4" in out
 
 
@@ -880,9 +886,9 @@ def test_png_names_odd_labels(tmp_path):
 
 
 def test_png_group_describe():
-    assert build.PngGroup(["preview/d,x,1.png"]).describe() == "preview/d,x,1.png"
-    g = build.PngGroup([f"preview/d,x,{i:02d}.png" for i in range(1, 12)], "frame 2, pages 3-13")
-    assert g.describe() == "preview/d,x,{01..11}.png  (frame 2, pages 3-13)"
+    assert build.PngGroup(["/scratch/d,x,1.png"]).describe() == "/scratch/d,x,1.png"
+    g = build.PngGroup([f"/scratch/d,x,{i:02d}.png" for i in range(1, 12)], "frame 2, pages 3-13")
+    assert g.describe() == "/scratch/d,x,{01..11}.png  (frame 2, pages 3-13)"
 
 
 def _png_size(path) -> tuple[int, int]:
@@ -892,11 +898,12 @@ def _png_size(path) -> tuple[int, int]:
 
 
 @needs_xelatex
-def test_paper_png_is_whole_page(docdir, capsys):
+def test_paper_png_is_whole_page(docdir, tmp_path, capsys):
     # --png renders whole pages (no cropping): a letter page at 110 dpi.
-    assert build.main([str(docdir), "--png"]) == 0
-    assert os.listdir(docdir / "preview") == ["main,p01.png"]
-    w, h = _png_size(docdir / "preview" / "main,p01.png")
+    scratch = tmp_path / "scratch"
+    assert build.main([str(docdir), "--png", str(scratch)]) == 0
+    assert os.listdir(scratch) == ["main,p01.png"]
+    w, h = _png_size(scratch / "main,p01.png")
     assert abs(w - 935) <= 2 and abs(h - 1210) <= 2, (w, h)
 
 

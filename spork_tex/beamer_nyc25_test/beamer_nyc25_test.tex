@@ -1,7 +1,7 @@
 % Smoke-test deck for the spork_tex Beamer + overlay system: a subset of the old
 % spork/docs/spork_nyc25.tex (contents need not match nyc25.py; formatting is the point).
-% Build:  cd spork_tex && python3 -m spork_tex.build spork_tex/beamer_nyc25_test --slides beamer_nyc25_test --png
-% One frame:  ... --slides beamer_nyc25_test --frame dag --skip-code --png
+% Build:  cd spork_tex && python3 -m spork_tex.build spork_tex/beamer_nyc25_test --slides beamer_nyc25_test --png <scratch dir>
+% One frame:  ... --slides beamer_nyc25_test --frame dag --skip-code --png <scratch dir>
 \documentclass[aspectratio=169]{beamer}
 \newif\ifsporkSlides \sporkSlidestrue
 \input{copied_styles/spork_style.tex}

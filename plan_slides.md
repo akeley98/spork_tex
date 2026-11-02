@@ -27,6 +27,9 @@ a match containing exactly one backtick of a pair is an error, color boundaries 
 Airlift census (2026-10-22): no runtime references outside the package; only docs/docstrings mention spork paths, and two listing
 tests compare against legacy `spork/docs/nyc25_tex/` output (they skip or drop that comparison if it is absent).
 Remaining: the arXiv `\colorbox` switch (open question below); phase 6 `--arxiv` exists but is untested on amspork3. See "Implementation notes" at the end.
+2026-11-01: `--png DIR` takes the output directory (an agent's scratch dir) instead of writing `<doc>/preview/`, and no
+longer deletes a job's old PNGs first: deleting files in a directory the build doesn't own was the risk, and label-based
+names already keep agents from mistaking an old render for the current one.
 Where this plan's directive/macro details disagree with the package README / REFERENCE_CARD, the package docs are current.
 
 Depends on: nothing in `exo`.
@@ -89,7 +92,6 @@ spork/docs/
     samples/                                        # exocc output        (gitignored)
     code/                                           # code_to_tex output  (gitignored)
     copied_styles/                                  # copies of spork_style.tex etc. (gitignored, chmod a-w)
-    preview/                                        # PNGs for agents      (gitignored)
 ```
 
 * `\input` paths are relative to the document directory (no `amspork3/` prefix).
@@ -398,8 +400,6 @@ samples/
 code/
 # build driver's copies of code_to_tex/latex/*.tex (spork_style.tex, code_to_tex_support.tex) + extra_styles; read-only, edit the originals instead
 copied_styles/
-# build driver --png renders: cropped page/frame/figure-step PNGs for agents to look at
-preview/
 
 # LaTeX auxiliary files (Beamer adds .nav/.snm/.toc/.vrb; -recorder adds .fls; tikzmark positions live in .aux)
 *.aux
@@ -510,6 +510,6 @@ Standalone figures compile in slides mode (see Figures). Tests are pytest inside
   Since 2026-10-28 deck/frame PNGs are named `<job>,<frame label>,<step>.png` from the .aux frame page ranges (`<job>,,f<N>,<step>` if
   unlabelled, `,f<N>` added for a label several frames share), paper pages `main,p<NN>.png`. `,` separates fields and `%` stands for `/`:
   neither can occur in a frame label (a comma splits `[label=..]` and `\includeonlyframes`; `%` is a comment) or a job name, so names
-  never collide and a job's cleanup never matches another job's files. pdftoppm renders into a temp dir first because its own
+  never collide. pdftoppm renders into a temp dir first because its own
   page-number padding depends on the page count. The build also notes duplicate frame labels (nothing caught a duplicate before).
 * `.gitignore` additionally needs `*_paperpreview.tex`, `*.fls`, `*.bbl`, `*.blg`.

@@ -2,7 +2,8 @@
 
 A walkthrough of the workflow, not of Beamer in general. Terse lookup: [REFERENCE_CARD.md](REFERENCE_CARD.md).
 Everything below exists in working form in [`beamer_nyc25_test/`](beamer_nyc25_test/) (in this package); open those files alongside.
-Build it with `python3 -m spork_tex.build spork_tex/beamer_nyc25_test --slides beamer_nyc25_test --png` from the `spork_tex/` root.
+Build it with `python3 -m spork_tex.build spork_tex/beamer_nyc25_test --slides beamer_nyc25_test --png <scratch>` from the `spork_tex/` root
+(`<scratch>`: your scratch directory, where the PNGs go).
 
 ## 0. The mental model
 
@@ -59,11 +60,11 @@ so evince never sees a broken PDF. Warnings (overfull boxes etc.) are listed in 
 ## 3. The fast loop: one frame at a time
 
 ```bash
-python3 -m spork_tex.build <doc> --slides talk --frame smem --skip-code --png
+python3 -m spork_tex.build <doc> --slides talk --frame smem --skip-code --png <scratch>
 ```
 
 About a second: builds only that frame (all its overlay steps) at the real slide size, and writes
-`<doc>/preview/talk_frame,smem,STEP.png`, one per overlay step (STEP from 1). `--skip-code` skips exocc and listing generation when you only touched LaTeX.
+`<scratch>/talk_frame,smem,STEP.png`, one per overlay step (STEP from 1). `--skip-code` skips exocc and listing generation when you only touched LaTeX.
 Lost track of where something is? `--where fig:dag` prints the frame and pages, plus the `--frame` command to rebuild it.
 
 ## 4. Steps and what the paper shows
@@ -156,7 +157,7 @@ so timing that only one frame needs goes in that frame (its own `\sporkReveal`s,
 * Node names are local to a `sporkfigure`: a reference to a name the figure doesn't define (misspelled, renamed in the body,
   from another figure) is the error `No shape named C2 is known` instead of an arrow silently drawn to some other figure's node.
 * The build warns when a `sporkfigure` is wider than the line (`\linewidth`) after scaling, in the paper and on each slide.
-* Look at a figure in context: its frame with `--frame dag --png`, or the paper page (`--where fig:dag` tells you which) with `--png`.
+* Look at a figure in context: its frame with `--frame dag --png <scratch>`, or the paper page (`--where fig:dag` tells you which) with `--png <scratch>`.
 * No `remember picture` or listing marks inside a `sporkfigure` (positions in a scaled box are wrong under xelatex);
   arrows between code lines are a plain picture next to the listing (section 7).
 
