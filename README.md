@@ -5,6 +5,10 @@ figures, style, and code listings cut out of real source files (checked by a com
 
 The name is a legacy of its origin in the Exo-GPU ("spork") project; the package itself does not depend on Exo.
 
+NOTICE: the repo is AI generated with almost no human oversight.
+It is questionable whether the code qualifies as copyrightable.
+Licensed permissively [LICENSE](./LICENSE);
+
 ## Install (dev mode)
 
 ```bash
