@@ -89,7 +89,9 @@ def say(msg: str) -> None:
 
 
 def warn(msg: str) -> None:
-    print(_c(f"[build] WARNING: {msg}", "33"), flush=True)
+    # Only the fixed label is colored: message text stays the terminal default so it is
+    # readable on low-contrast palettes (e.g. dark red/yellow on black).
+    print(f"[build] {_c('WARNING:', '33')} {msg}", flush=True)
 
 
 # ---------------------------------------------------------------------------
@@ -871,7 +873,7 @@ def run(opts: Options) -> int:
 
     failed = [r for r in results if r.pages is None]
     if failed:
-        print(_c(f"[build] FAILED: no PDF for {', '.join(r.job.name for r in failed)}", "1;31"), flush=True)
+        print(f"[build] {_c('FAILED:', '1;31')} no PDF for {', '.join(r.job.name for r in failed)}", flush=True)
         return 1
     return 0
 
@@ -888,7 +890,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return run(opts)
     except BuildError as e:
-        print(_c(f"[build] ERROR: {e}", "1;31", sys.stderr), file=sys.stderr, flush=True)
+        print(f"[build] {_c('ERROR:', '1;31', sys.stderr)} {e}", file=sys.stderr, flush=True)
         return 1
     finally:
         os.chdir(old_cwd)
