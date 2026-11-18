@@ -46,6 +46,7 @@ python3 -m spork_tex.build <doc> --slides <deck> --where fig:dag   # which page/
 ```
 
 Order: copy styles -> `check` (exocc) -> listing generator -> xelatex (reruns until stable).
+`--skip-check` skips only `check`; `--skip-code` skips `check` and the listing generator.
 Warnings are summarized at the end and never block the build. The summary names each job's full LaTeX log
 (`<doc>/<job>.log`) and points into it as `[main.log:914]`; errors also show TeX's own context excerpt.
 `--png DIR` writes previews to DIR (use your scratch directory; a relative DIR is taken from your cwd, not `<doc>`), named by frame label and overlay step: `<job>,<label>,<step>.png`

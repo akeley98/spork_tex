@@ -1,7 +1,7 @@
 """Build driver for a spork_tex document directory (paper + Beamer decks).
 
     python3 -m spork_tex.build <dir> [--slides DECK]... [--no-paper]
-        [--frame LABEL[,LABEL]] [--skip-code]
+        [--frame LABEL[,LABEL]] [--skip-check] [--skip-code]
         [--png DIR] [--where LABEL] [--arxiv OUT.tar.gz]
 
 Replaces the old ``amspork3_tex.sh`` (spork repo, ``docs/``). See ``plan_slides.md`` at the
@@ -125,6 +125,8 @@ def make_parser() -> argparse.ArgumentParser:
     p.add_argument("--frame", metavar="LABEL[,LABEL]",
                    help="build only these frames of the single --slides DECK (jobname DECK_frame); "
                         "skips the paper and the full deck; never updates viewer copies")
+    p.add_argument("--skip-check", action="store_true",
+                   help="skip the check command (e.g. exocc) but still run the listing generator")
     p.add_argument("--skip-code", action="store_true",
                    help="skip the check command and the listing generator")
     p.add_argument("--png", metavar="DIR",
@@ -151,6 +153,7 @@ class Options:
     slides: list[str]
     build_paper: bool
     frame: list[str] | None
+    skip_check: bool
     skip_code: bool
     png: str | None  # absolute PNG output directory
     where: str | None
@@ -203,6 +206,7 @@ def parse_args(argv: list[str] | None = None) -> Options:
         slides=slides,
         build_paper=build_paper,
         frame=frame,
+        skip_check=a.skip_check,
         skip_code=a.skip_code,
         png=png,
         where=a.where,
@@ -816,7 +820,8 @@ def run(opts: Options) -> int:
 
     refresh_copied_styles(cfg["extra_styles"])
     if not opts.skip_code:
-        run_check(cfg["check"])
+        if not opts.skip_check:
+            run_check(cfg["check"])
         run_listings(cfg["listing_sources"])
 
     if opts.arxiv is not None:

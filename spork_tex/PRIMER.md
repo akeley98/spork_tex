@@ -64,7 +64,7 @@ python3 -m spork_tex.build <doc> --slides talk --frame smem --skip-code --png <s
 ```
 
 About a second: builds only that frame (all its overlay steps) at the real slide size, and writes
-`<scratch>/talk_frame,smem,STEP.png`, one per overlay step (STEP from 1). `--skip-code` skips exocc and listing generation when you only touched LaTeX.
+`<scratch>/talk_frame,smem,STEP.png`, one per overlay step (STEP from 1). `--skip-code` skips exocc and listing generation when you only touched LaTeX; `--skip-check` skips only exocc.
 Lost track of where something is? `--where fig:dag` prints the frame and pages, plus the `--frame` command to rebuild it.
 
 ## 4. Steps and what the paper shows

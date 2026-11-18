@@ -206,6 +206,11 @@ def test_skip_code_skips_check(docdir):
     assert build.main([str(docdir), "--no-paper", "--skip-code"]) == 0
 
 
+def test_skip_check_skips_check(docdir):
+    _write_config(docdir, check=[sys.executable, "-c", "raise SystemExit(1)"])
+    assert build.main([str(docdir), "--no-paper", "--skip-check"]) == 0
+
+
 class _StubListingError(Exception):
     pass
 
@@ -647,7 +652,7 @@ def test_stale_pdf_does_not_count(fake_tex, monkeypatch):
 
 def test_frame_command_line(fake_tex):
     job = build.plan_jobs(
-        build.Options(str(fake_tex), ".", ["doc"], False, ["a", "b"], True, False, None, None, False),
+        build.Options(str(fake_tex), ".", ["doc"], False, ["a", "b"], False, True, False, None, None, False),
         build.CONFIG_DEFAULTS,
     )[0]
     assert job.name == "doc_frame"
