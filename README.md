@@ -7,7 +7,7 @@ The name is a legacy of its origin in the Exo-GPU ("spork") project; the package
 
 NOTICE: the repo is AI generated with almost no human oversight.
 It is questionable whether the code qualifies as copyrightable.
-Licensed permissively [LICENSE](./LICENSE);
+Licensed permissively: [LICENSE](./LICENSE).
 
 ## Install (dev mode)
 
